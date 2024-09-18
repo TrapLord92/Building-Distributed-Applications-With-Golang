@@ -1,0 +1,156 @@
+{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "schemes": [
+    "http"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a sample recipes API. You can find out more at https://github.com/TrapLord92/Building-Distributed-Applications-With-Golang",
+    "title": "Recipes API",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8080",
+  "basePath": "/",
+  "paths": {
+    "/recipes": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Lists all available recipes.",
+        "operationId": "listRecipes"
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Creates a new recipe.",
+        "operationId": "createRecipe",
+        "parameters": [
+          {
+            "$ref": "#/definitions/Recipe",
+            "description": "The recipe to create",
+            "name": "recipe",
+            "in": "body",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/recipes/search": {
+      "get": {
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Search recipes by tag.",
+        "operationId": "searchRecipes",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "The tag to search for",
+            "name": "tag",
+            "in": "query",
+            "required": true
+          }
+        ]
+      }
+    },
+    "/recipes/{id}": {
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Updates an existing recipe.",
+        "operationId": "updateRecipe",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "$ref": "#/definitions/Recipe",
+            "description": "The recipe to update",
+            "name": "recipe",
+            "in": "body",
+            "required": true
+          }
+        ]
+      },
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Deletes an existing recipe.",
+        "operationId": "deleteRecipe",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "id",
+            "in": "path",
+            "required": true
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Recipe": {
+      "type": "object",
+      "title": "Recipe represents a recipe in the system.",
+      "required": [
+        "id",
+        "name",
+        "ingredients",
+        "published_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "The ID of the recipe",
+          "type": "string",
+          "x-go-name": "ID"
+        },
+        "ingredients": {
+          "description": "The ingredients required for the recipe",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Ingredients"
+        },
+        "name": {
+          "description": "The name of the recipe",
+          "type": "string",
+          "x-go-name": "Name"
+        },
+        "published_at": {
+          "description": "The time when the recipe was published",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "PublishedAt"
+        },
+        "tags": {
+          "description": "A list of tags associated with the recipe",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "x-go-name": "Tags"
+        }
+      },
+      "x-go-package": "github.com/TrapLord92/Building-Distributed-Applications-With-Golang/S1Distributed-Microservices/1Setting-Up-Api-Endpoints/recipes-Api/go-swagger"
+    }
+  }
+}
