@@ -6,7 +6,7 @@
 //	 Host: localhost:8080
 //		BasePath: /
 //		Version: 1.0.0
-//		Contact: Mohamed Labouardy <mohamed@labouardy.com> https://labouardy.com
+//		Contact: TrapLord <traplord345@gmail.com>
 //
 //		Consumes:
 //		- application/json
