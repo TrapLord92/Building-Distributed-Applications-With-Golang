@@ -1,6 +1,6 @@
 // Recipes API
 //
-// This is a sample recipes API. You can find out more about the API at https://github.com/PacktPublishing/Building-Distributed-Applications-in-Gin.
+// This is a sample recipes API. You can find out more about the API at https://github.com/TrapLord92/Building-Distributed-Applications-With-Golang.
 //
 //		Schemes: http
 //	 Host: localhost:8080
