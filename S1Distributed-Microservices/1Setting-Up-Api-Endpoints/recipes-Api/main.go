@@ -1,3 +1,21 @@
+// Recipes API
+//
+// This is a sample recipes API. You can find out more at https://github.com/TrapLord92/Building-Distributed-Applications-With-Golang
+// Schemes: http
+// Host: localhost:8080
+// BasePath: /
+// Version: 1.0.0
+// Contact:
+//  name: TrapLord
+//  email: traplord345@gmail.com
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
+
 package main
 
 import (
@@ -11,6 +29,7 @@ import (
 	"github.com/rs/xid"
 )
 
+//
 //Implementing HTTP routes
 
 type Recipe struct {
