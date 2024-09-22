@@ -1,0 +1,15 @@
+services:
+  worker:
+    image: worker
+    environment:
+      - MONGO_URI=mongodb://admin:password@mongodb:27017/test?authSource=admin&readPreference=primary&ssl=false
+      - MONGO_DATABASE=demo2
+      - RABBITMQ_URI=amqp://user:password@rabbitmq:5672
+      - RABBITMQ_QUEUE=rss
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    external: true
+
