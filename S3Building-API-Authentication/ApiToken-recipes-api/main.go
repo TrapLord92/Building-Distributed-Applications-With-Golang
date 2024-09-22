@@ -1,0 +1,171 @@
+// Recipes API
+//
+// This is a sample recipes API. You can find out more at https://github.com/TrapLord92/Building-Distributed-Applications-With-Golang
+// Schemes: http
+// Host: localhost:8080
+// BasePath: /
+// Version: 1.0.0
+// Contact:
+//  name: TrapLord
+//  email: traplord345@gmail.com
+//
+// Consumes:
+// - application/json
+//
+// Produces:
+// - application/json
+// swagger:meta
+
+package main
+
+import (
+	"encoding/json"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
+)
+
+//
+//Implementing HTTP routes
+
+type Recipe struct {
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Tags        []string  `json:"tags"`
+	Ingredients []string  `json:"ingredients"`
+	PublishedAt time.Time `json:"published_at"`
+}
+
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Perform authentication logic here
+		// If unauthorized, use c.AbortWithStatus or c.JSON and return
+		apiKey := c.GetHeader("X-API-KEY")
+		if apiKey == "" || apiKey != os.Getenv("X_API_KEY") {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "API key not provided or invalid"})
+			c.Abort() // stop further handlers from being executed
+			return
+		}
+		c.Next() // Continue to the next handler if authorized
+	}
+}
+
+// variables for mock data
+var recipes []Recipe
+
+func init() {
+	recipes = make([]Recipe, 0)
+	file, _ := os.ReadFile("recipes.json")
+	_ = json.Unmarshal([]byte(file), &recipes)
+}
+func NewRecipeHandler(c *gin.Context) {
+
+	// if c.GetHeader("X-API-KEY") != os.Getenv("X_API_KEY") {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
+	// 		"error": "API key not provided or invalid"})
+	// 	return
+	// }
+
+	var recipe Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	recipe.ID = xid.New().String()
+	recipe.PublishedAt = time.Now()
+	recipes = append(recipes, recipe)
+}
+func ListRecipesHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, recipes)
+}
+
+func UpdateRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	var recipe Recipe
+	if err := c.ShouldBindJSON(&recipe); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error()})
+		return
+	}
+	index := -1
+	for i := 0; i < len(recipes); i++ {
+		if recipes[i].ID == id {
+			index = i
+		}
+	}
+	if index == -1 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Recipe not found"})
+		return
+	}
+	recipes[index] = recipe
+	c.JSON(http.StatusOK, recipe)
+}
+
+func DeleteRecipeHandler(c *gin.Context) {
+	id := c.Param("id")
+	index := -1
+	for i := 0; i < len(recipes); i++ {
+		if recipes[i].ID == id {
+			index = i
+		}
+	}
+	if index == -1 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Recipe not found"})
+		return
+	}
+	recipes = append(recipes[:index], recipes[index+1:]...)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Recipe has been deleted"})
+
+}
+
+func SearchRecipesHandler(c *gin.Context) {
+	tag := c.Query("tag")
+	listOfRecipes := make([]Recipe, 0)
+	for i := 0; i < len(recipes); i++ {
+		found := false
+		for _, t := range recipes[i].Tags {
+			if strings.EqualFold(t, tag) {
+				found = true
+			}
+		}
+		if found {
+			listOfRecipes = append(listOfRecipes,
+				recipes[i])
+		}
+	}
+	c.JSON(http.StatusOK, listOfRecipes)
+}
+
+func main() {
+	// router := gin.Default()
+	// router.POST("/recipes", NewRecipeHandler)
+	// router.GET("/recipes", ListRecipesHandler)
+	// router.PUT("/recipes/:id", UpdateRecipeHandler)
+	// router.DELETE("/recipes/:id", DeleteRecipeHandler)
+	// router.GET("/recipes/search", SearchRecipesHandler)
+	// router.Run(":8080")
+
+	//Initialize the Gin router
+	router := gin.Default()
+
+	// Group for authorized routes using AuthMiddleware
+	authorized := router.Group("/")
+	authorized.Use(AuthMiddleware())
+
+	{
+		authorized.POST("/recipes", NewRecipeHandler)
+		authorized.GET("/recipes", ListRecipesHandler)
+		authorized.PUT("/recipes/:id", UpdateRecipeHandler)
+		authorized.DELETE("/recipes/:id", DeleteRecipeHandler)
+	}
+
+	// Start the server on port 8080
+	router.Run(":8080")
+}
